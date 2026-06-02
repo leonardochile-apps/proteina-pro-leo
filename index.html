@@ -337,7 +337,7 @@
     <div class="field">
       <label>Peso corporal</label>
       <div class="num-input">
-        <input id="inPeso" type="number" inputmode="decimal" placeholder="72" min="30" max="250">
+        <input id="inPeso" type="text" inputmode="decimal" autocomplete="off" placeholder="72,5">
         <span class="unit">kg</span>
       </div>
     </div>
@@ -419,7 +419,7 @@
       <div class="foods" id="foods"></div>
       <div class="custom">
         <input class="c-name" id="cName" type="text" placeholder="Otro alimento (ej: batido)">
-        <input class="c-g" id="cGrams" type="number" inputmode="decimal" placeholder="g proteína" min="0" max="300">
+        <input class="c-g" id="cGrams" type="text" inputmode="decimal" autocomplete="off" placeholder="g proteína">
         <button id="btnCustom">
           <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
           Agregar
@@ -592,7 +592,7 @@ function renderProfileChip(){
   const actName = (ACTIVITIES.find(a=>a.id===p.actividad)||{}).name || '';
   document.getElementById('profileChip').innerHTML = `
     <div class="profile-chip">
-      <span><b>${p.peso}</b> kg</span><span class="dot">·</span>
+      <span><b>${String(p.peso).replace('.', ',')}</b> kg</span><span class="dot">·</span>
       <span><b>${p.edad}</b> años</span><span class="dot">·</span>
       <span>${actName}</span>
       <button class="chip-edit" id="chipEdit" title="Editar perfil">
@@ -657,7 +657,7 @@ function renderHero(){
 
   document.getElementById('goalNum').textContent = c.goal;
 
-  let fStr = `<b>${state.profile.peso} kg</b> × ${fmtFactor(c.factor)} g/kg`;
+  let fStr = `<b>${String(state.profile.peso).replace('.', ',')} kg</b> × ${fmtFactor(c.factor)} g/kg`;
   let factorSub = (ACTIVITIES.find(a=>a.id===state.profile.actividad)||{}).name || '';
   if(c.bonus>0){
     const rango = state.profile.edad>=60 ? '60+' : '40–59';
@@ -719,7 +719,7 @@ async function removeEntry(id){
 }
 
 function validateAndSave(){
-  const peso = parseFloat(document.getElementById('inPeso').value);
+  const peso = parseFloat((document.getElementById('inPeso').value||'').replace(',', '.'));
   const edad = parseInt(document.getElementById('inEdad').value, 10);
   const err = document.getElementById('onbErr');
   if(!peso || peso<30 || peso>250){ err.textContent='Ingresa un peso válido (entre 30 y 250 kg).'; return; }
@@ -740,7 +740,7 @@ function bindEvents(){
 
   document.getElementById('btnCustom').addEventListener('click',()=>{
     const name = document.getElementById('cName').value.trim();
-    const g = parseFloat(document.getElementById('cGrams').value);
+    const g = parseFloat((document.getElementById('cGrams').value||'').replace(',', '.'));
     if(!name){ document.getElementById('cName').focus(); return; }
     if(!g || g<=0 || g>300){ document.getElementById('cGrams').focus(); return; }
     addEntry(name, g, '🍽️');
